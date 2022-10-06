@@ -19,4 +19,6 @@ class DataController extends ChangeNotifier {
     list[i].valueToggle = value;
     notifyListeners();
   }
+
+  int get listSize => list.length;
 }
