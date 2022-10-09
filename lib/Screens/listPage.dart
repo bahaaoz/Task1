@@ -97,8 +97,6 @@ class _ListPageState extends State<ListPage> {
                           onChanged: (value) {
                             if (depounce?.isActive ?? false) depounce?.cancel();
                             depounce = Timer(const Duration(seconds: 1), () {
-                              print("bahaa");
-
                               if (searchStr != serchController.text) {
                                 setState(() {
                                   searchStr = value.trim();
@@ -376,8 +374,8 @@ class _ListPageState extends State<ListPage> {
                                 const BorderRadius.all(Radius.circular(10)),
                             color: const Color.fromARGB(255, 230, 229, 229)),
                         child: Text(
-                          todo.name.length > 20
-                              ? "${todo.name.substring(0, 20)}..."
+                          todo.name.length > 15
+                              ? "${todo.name..substring(0, 15)}..."
                               : todo.name,
                           style: const TextStyle(
                             fontSize: 20,
