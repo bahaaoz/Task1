@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:task1/colors.dart';
 
 import '../Model/TODO.dart';
 import '../Model/dataController.dart';
+import 'EditAddForm.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({Key? key}) : super(key: key);
@@ -23,19 +23,12 @@ class _ListPageState extends State<ListPage> {
   Timer? depounce;
 //___________________________
 
-//__________ADD_____________________
-//_____________________________________
-  DateTime datePick = DateTime.now();
-  String nameTODOStr = "";
-  String descriptionStr = "";
-  String datePickStr = "";
-
-  TextEditingController nameController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-//______________________________________________
+  final midwidth = 600;
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: blue,
@@ -46,14 +39,13 @@ class _ListPageState extends State<ListPage> {
         backgroundColor: blue,
         child: const Icon(Icons.note_add_rounded),
         onPressed: () {
-          nameController.clear();
-          descriptionController.clear();
-          datePickStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
           showModalBottomSheet(
             backgroundColor: Colors.transparent,
             context: context,
             builder: (context) {
-              return dialogSheet("ADD", null);
+              return formEditAdd(
+                todo: null,
+              );
             },
           );
         },
@@ -89,8 +81,9 @@ class _ListPageState extends State<ListPage> {
                                   depounce = Timer(
                                       const Duration(milliseconds: 500), () {
                                     setState(() {
-                                      searchStr = "";
+                                      searchStr = ""; //........
                                     });
+                                    dataConroller.finalResultList("");
                                   });
                                 },
                               )),
@@ -101,6 +94,7 @@ class _ListPageState extends State<ListPage> {
                                 setState(() {
                                   searchStr = value.trim();
                                 });
+                                dataConroller.finalResultList(value.trim());
                               }
                             });
                           },
@@ -109,7 +103,7 @@ class _ListPageState extends State<ListPage> {
                       MaterialButton(
                         onPressed: () {},
                         child: const Text(
-                          "data",
+                          "test",
                         ),
                       )
                     ],
@@ -122,21 +116,13 @@ class _ListPageState extends State<ListPage> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     mainAxisExtent: 210,
                     crossAxisCount:
-                        (MediaQuery.of(context).size.width < 600) ? 1 : 2,
+                        (MediaQuery.of(context).size.width < midwidth) ? 1 : 2,
                   ),
                   itemCount: dataConroller.listSize,
                   itemBuilder: (context, index) {
-                    print(MediaQuery.of(context).size.width);
                     TODO todo = dataConroller.list[index];
-                    if (todo.name
-                            .toLowerCase()
-                            .contains(searchStr.toLowerCase()) ||
-                        todo.description
-                            .toLowerCase()
-                            .contains(searchStr.toLowerCase())) {
-                      return card(todo, dataConroller);
-                    }
-                    return Container();
+
+                    return card(todo, dataConroller);
                   },
                 ),
               ),
@@ -147,194 +133,7 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  Container dialogSheet(String from, TODO? todo) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(
-          color: Color.fromARGB(247, 255, 255, 255),
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      child: Column(
-        children: [
-          Text(
-            "${from} TODO",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 25,
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            decoration: const BoxDecoration(
-                border: Border(
-                    top: BorderSide(
-                        color: Color.fromARGB(179, 0, 0, 0), width: 1))),
-            height: 15,
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: Column(
-              //اذا بعمله ليست فيو بضرب
-
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    label: Text(
-                      "TODO Name",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    nameTODOStr = value;
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  controller: descriptionController,
-                  maxLines: 2,
-                  minLines: 1,
-                  decoration: const InputDecoration(
-                    counterStyle: TextStyle(fontWeight: FontWeight.bold),
-                    border: OutlineInputBorder(),
-                    label: Text(
-                      "Description",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                      ),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    descriptionStr = value;
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: lightBlue,
-                            border: Border.all(
-                              width: 1,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(5),
-                            )),
-                        child: MaterialButton(
-                          hoverColor: Colors.black38,
-                          onPressed: () {
-                            showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2030),
-                            ).then((date) {
-                              setState(() {
-                                datePick = date!;
-                                datePickStr =
-                                    DateFormat('yyyy-MM-dd').format(datePick);
-                              });
-                            });
-                          },
-                          child: const Text(
-                            "Due Date",
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 40,
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        datePickStr,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Consumer<DataController>(
-                  builder: (context, dataController, child) {
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 40,
-                            decoration: BoxDecoration(
-                                color: blue,
-                                border: Border.all(width: 1, color: darkBlue),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(30))),
-                            child: MaterialButton(
-                              onPressed: () {
-                                if (from == "ADD") {
-                                  TODO newTodo = TODO(
-                                    nameTODOStr.trim(),
-                                    descriptionStr.trim(),
-                                    datePickStr,
-                                    DateTime.now(),
-                                  );
-
-                                  dataController.addTODO(newTodo);
-
-                                  setState(() {
-                                    nameController.clear();
-                                    descriptionController.clear();
-                                    datePick = DateTime.now();
-                                  });
-                                } else {
-                                  setState(() {
-                                    todo?.name = nameController.text.trim();
-                                    todo?.description =
-                                        descriptionController.text.trim();
-                                    todo?.dateDue = datePickStr;
-                                  });
-                                }
-                              },
-                              child: Text(
-                                from,
-                                style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+//card
   Container card(TODO todo, DataController dataConroller) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -357,6 +156,7 @@ class _ListPageState extends State<ListPage> {
                 ),
                 color: Color.fromARGB(255, 248, 248, 248)),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   flex: 10,
@@ -426,7 +226,6 @@ class _ListPageState extends State<ListPage> {
                 Expanded(
                   flex: 1,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       IconButton(
                         onPressed: () {
@@ -442,46 +241,27 @@ class _ListPageState extends State<ListPage> {
                         onChanged: (value) {
                           dataConroller.changToggle(todo);
                         },
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return formEditAdd(
+                                todo: todo,
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.edit,
+                        ),
                       )
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                width: 60,
-                height: 25,
-                decoration: const BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10))),
-                child: MaterialButton(
-                  onPressed: () {
-                    nameController.text = todo.name;
-                    descriptionController.text = todo.description;
-                    datePickStr = todo.dateDue;
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return dialogSheet("Edit", todo);
-                      },
-                    );
-                  },
-                  child: const Text(
-                    "Edit",
-                    style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              )
-            ],
           ),
         ],
       ),
