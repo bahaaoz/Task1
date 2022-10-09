@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:task1/Model/dataController.dart';
 import 'package:task1/Screens/listPage.dart';
 
-import 'Screens/addPage.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -19,8 +17,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         initialRoute: "list",
         routes: {
-          "list": (context) => ListPage(),
-          "add": (context) => AddPage(),
+          "list": (context) => const ListPage(),
         },
         debugShowCheckedModeBanner: false,
         home: Scaffold(),
