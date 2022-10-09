@@ -15,8 +15,8 @@ class DataController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changToggle(bool value, int i) {
-    list[i].valueToggle = value;
+  void changToggle(TODO todo) {
+    todo.valueToggle = !todo.valueToggle;
     notifyListeners();
   }
 
